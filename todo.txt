@@ -1,0 +1,26 @@
+To do list celestial body classification
+
+
+* Implement softmax activation function in the final layer
+* Implement mini-batch gradient descent
+* Implement Adam optimization 
+
+
+
+Intro
+* Dataset
+* Stars, galaxies and quasars
+
+
+Objectives
+* Use mini-batch gradient descent with Adam optimization to find the accuracy of a neural network
+
+
+
+Visualization
+* Visualize distribution of celestial bodies in stars, galaxies and quasars
+* Visualize correctly predicted body counts
+* Accuracy 
+
+
+
