@@ -19,7 +19,7 @@ def init_params_and_V(activation_layers):
         
 
 
-
+# To be replaced
 def train_model(X, y, parameters, V, iterations, learning_rate, reg_param):
     logging_frequency = 10
     costs_iterations = {"costs": [], "iterations": []}
@@ -36,6 +36,28 @@ def train_model(X, y, parameters, V, iterations, learning_rate, reg_param):
         update_parameters(parameters, gradients, V, learning_rate, reg_param)
         
     return costs_iterations, parameters
+
+
+
+def train_mini_batch_model(X_batches, y_batches, parameters, V, epochs, learning_rate, reg_param):
+    logging_frequency = 10
+    costs_iterations = {"costs": [], "iterations": []}
+    
+    for i in range(epochs):
+        cost = 0
+        for j in range(len(X_batches)):
+            AL, caches = forward_propagation(X_batches[j], parameters)
+            cost += compute_cost(AL, y_batches[j], parameters, reg_param)
+
+            gradients = backprop(AL, y_batches[j], caches)
+            update_parameters(parameters, gradients, V, learning_rate, reg_param)
+            
+        if i % logging_frequency == 0:
+            costs_iterations["costs"].append(cost)
+            costs_iterations["iterations"].append(i)
+                     
+    return costs_iterations, parameters
+            
         
 
 
