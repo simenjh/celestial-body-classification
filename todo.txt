@@ -1,8 +1,9 @@
 To do list celestial body classification
 
 
-* Implement softmax activation function in the final layer
-* Implement mini-batch gradient descent
+* Implement softmax activation function in the final layer xxx
+* Implement loss function for softmax xxx
+* Implement mini-batch gradient descent xxx
 * Implement Adam optimization 
 
 
