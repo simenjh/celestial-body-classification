@@ -2,35 +2,44 @@ import numpy as np
 from scipy.special import expit
 
 
-def init_params_and_V(activation_layers):
+def init_params_V_and_S(activation_layers):
     params = {}
     V = {}
+    S = {}
     L = len(activation_layers)
     
     for l in range(1, L):
+        # Kaiming He initialization
         params[f"W{l}"] = np.random.randn(activation_layers[l], activation_layers[l-1]) * np.sqrt(2 / activation_layers[l-1])
         params[f"b{l}"] = np.zeros((activation_layers[l], 1))
 
-        # Momemntum params
+        # Momentum params
         V[f"dW{l}"] = np.zeros((activation_layers[l], activation_layers[l-1]))
         V[f"db{l}"] = np.zeros((activation_layers[l], 1))
 
-    return params, V
+        # RMSprop params
+        S[f"dW{l}"] = np.zeros((activation_layers[l], activation_layers[l-1]))
+        S[f"db{l}"] = np.zeros((activation_layers[l], 1))
+
+    return params, V, S
 
 
 
-def train_mini_batch_model(X_batches, y_batches, parameters, V, epochs, learning_rate, reg_param):
+def train_mini_batch_model(X_batches, y_batches, parameters, V, S, epochs, learning_rate, reg_param):
+    t = 0
     logging_frequency = 10
     costs_epochs = {"costs": [], "epochs": []}
 
     for i in range(epochs):
         cost = 0
         for j in range(len(X_batches)):
+            batch_size = X_batches[j].shape[1]
             AL, caches = forward_propagation(X_batches[j], parameters)
             cost += compute_cost(AL, y_batches[j], parameters, reg_param)
 
+            t +=1 
             gradients = backprop(AL, y_batches[j], caches)
-            update_parameters(parameters, gradients, V, learning_rate, reg_param)
+            update_parameters(parameters, gradients, V, S, batch_size, t, learning_rate, reg_param)
 
         if i % logging_frequency == 0:
             costs_epochs["costs"].append(cost)
@@ -177,29 +186,37 @@ def softmax(Z):
 
 
 
-def update_parameters(parameters, gradients, V, learning_rate, reg_param):
+def update_parameters(parameters, gradients, V, S, batch_size, t, learning_rate, reg_param):
     L = len(parameters) // 2
-    m = parameters["W1"].shape[1]
-    beta = 0.9
-
+    beta1 = 0.9
+    beta2 = 0.999
+    epsilon = 1e-4
+    
     for l in range(1, L+1):
-        reg_term = (reg_param / m) * parameters[f"W{l}"]
+        reg_term = (reg_param / batch_size) * parameters[f"W{l}"]
 
         # Momentum gradients
-        V[f"dW{l}"] = beta * V[f"dW{l}"] + (1 - beta) * (gradients[f"dW{l}"] + reg_term)
-        V[f"db{l}"] = beta * V[f"db{l}"] + (1 - beta) * (gradients[f"db{l}"])
+        V[f"dW{l}"] = beta1 * V[f"dW{l}"] + (1 - beta1) * (gradients[f"dW{l}"] + reg_term)
+        V[f"db{l}"] = beta1 * V[f"db{l}"] + (1 - beta1) * (gradients[f"db{l}"])
+
+        # RMSprop gradients
+        S[f"dW{l}"] = beta2 * S[f"dW{l}"] + (1 - beta2) * np.square(gradients[f"dW{l}"] + reg_term)
+        S[f"db{l}"] = beta2 * S[f"db{l}"] + (1 - beta2) * np.square(gradients[f"db{l}"])
+
+        # Bias correction
+        V_dW_corrected = V[f"dW{l}"] / (1 - (beta1**t))
+        V_db_corrected = V[f"db{l}"] / (1 - (beta1**t))
+        S_dW_corrected = S[f"dW{l}"] / (1 - (beta2**t))
+        S_db_corrected = S[f"db{l}"] / (1 - (beta2**t))
+
+        # if(np.any(S[f"dW{l}"] < 0)):
+        #     print("Not fucking good!")
+
+        # Adam optimization
+        parameters[f"W{l}"] -= learning_rate * (V_dW_corrected / (np.sqrt(S_dW_corrected) + epsilon))
+        parameters[f"b{l}"] -= learning_rate * (V_db_corrected / (np.sqrt(S_db_corrected) + epsilon))
 
         
-
-        parameters[f"W{l}"] -= learning_rate * V[f"dW{l}"]
-        parameters[f"b{l}"] -= learning_rate * V[f"db{l}"]
-        
-        # parameters[f"W{l}"] -= learning_rate * (gradients[f"dW{l}"] + reg_term)
-        # parameters[f"b{l}"] -= learning_rate * gradients[f"db{l}"]
-
-
-
-
 
 
 

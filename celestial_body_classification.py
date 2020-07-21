@@ -14,6 +14,7 @@ from hyperopt import Trials
 
 X_train_std = None
 X_cv_std = None
+X_test_std = None
 y_train = None
 y_cv = None
 y_test = None
@@ -29,7 +30,9 @@ def celestial_body(data_file, epochs=10, learning_rate=0.1, reg_param=0.1, batch
     
     X, y = dproc.read_and_preprocess_data(data_file)
     
-    X_train, X_cv, y_train, y_cv = train_test_split(X, y, test_size=0.3)
+    X_train, X_cv, y_train, y_cv = train_test_split(X, y, test_size=0.1)
+    X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=(1/9))
+
 
     # Standardize data
     X_train_std, X_cv_std = dproc.standardize(X_train, X_cv)
@@ -82,7 +85,11 @@ def bayes_tune(plot_results):
     }
 
     bayes_trials = Trials()
-    best = fmin(objective, space, algo=tpe.suggest, max_evals=100, trials=bayes_trials) 
+    best = fmin(objective, space, algo=tpe.suggest, max_evals=3, trials=bayes_trials)
+
+    best_result = bayes_trials.best_trial["result"]
+    test_accuracy = model.compute_accuracy(X_test.std, y_test, best_result["parameters"])
+    print(test_accuracy)
 
     if plot_results:
         dataplot.plot_results_bayes(bayes_trials)
@@ -96,9 +103,9 @@ def objective(hyper_params):
     learning_rate = hyper_params["learning_rate"]
     epochs = int(hyper_params["epochs"])
     reg_param = hyper_params["reg_param"]
-    parameters, V, S = model.init_params_S_and_V(activation_layers)
+    parameters, V, S = model.init_params_V_and_S(activation_layers)
 
-    model.train_mini_batch_model(X_batches, y_batches, parameters, V, epochs, learning_rate, reg_param)
+    model.train_mini_batch_model(X_batches, y_batches, parameters, V, S, epochs, learning_rate, reg_param)
 
     train_accuracy = model.compute_accuracy(X_train_std.T, y_train.T, parameters)
     cv_accuracy = model.compute_accuracy(X_cv_std.T, y_cv.T, parameters)
@@ -107,7 +114,7 @@ def objective(hyper_params):
     
     print(f"CV accuracy: {cv_accuracy}")
 
-    return {"loss": loss, "train_accuracy": train_accuracy, "cv_accuracy": cv_accuracy, "hyper_params": hyper_params, "status": STATUS_OK}
+    return {"loss": loss, "train_accuracy": train_accuracy, "cv_accuracy": cv_accuracy, "hyper_params": hyper_params, "status": STATUS_OK, "parameters": parameters,}
 
 
     
