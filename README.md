@@ -52,10 +52,10 @@ The neural network has 1-2 hidden layers, each with 5-32 hidden units. It uses m
 
 
 ## Results
-* Overall test accuracy: 0.985
-* Stars accuracy: 0.990
-* Galaxies accuracy: 0.983
-* Quasars accuracy: 0.967
+* Overall test accuracy: 98.5%
+* Stars accuracy: 99.0%
+* Galaxies accuracy: 98.3%
+* Quasars accuracy: 96.7%
 
 
 ## Run program
