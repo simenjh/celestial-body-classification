@@ -211,6 +211,7 @@ def regularize_cost(parameters, m, reg_param):
     return (reg_param / (2 * m)) * temp
 
 
+
 def compute_test_accuracy(X, y, parameters):
     AL, caches = forward_propagation(X, parameters)
     

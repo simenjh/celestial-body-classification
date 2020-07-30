@@ -25,7 +25,7 @@ y_batches = None
 
 
 
-def celestial_body(data_file, epochs=10, learning_rate=0.1, reg_param=0.1, batch_size=64, plot_results=False):
+def celestial_body(data_file, epochs=10, learning_rate=0.1, reg_param=0.1, batch_size=64):
     global X_train_std, X_cv_std, X_test_std, y_train, y_cv, y_test, X_batches, y_batches
 
     # dataplot.plot_class_distribution(data_file)
@@ -60,7 +60,7 @@ def bayes_tune(plot_results):
     }
 
     bayes_trials = Trials()
-    best = fmin(objective, space, algo=tpe.suggest, max_evals=100, trials=bayes_trials)
+    best = fmin(objective, space, algo=tpe.suggest, max_evals=1, trials=bayes_trials)
 
     best_result = bayes_trials.best_trial["result"]
 
