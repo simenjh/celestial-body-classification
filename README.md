@@ -1,36 +1,53 @@
-# Heart disease detection through neural network 2
+# Predicting stars, galaxies and quasars with neural network
 
-This project is a continuation of [Heart disease detection through logistic regression 1](https://github.com/simenjh/heart-disease-regression-1), [Heart disease detection through logistic regression 2](https://github.com/simenjh/heart-disease-regression-2) and [Heart disease detection through neural network 1](https://github.com/simenjh/heart-disease-nn-1)
+## Summary
+In this project the celestial bodies stars, galaxies and quasars are predicted using a neural network implemented from scratch. The neural network uses mini-batch gradient descent with Adam optimization and Bayesian hyperparameter tuning.
 
-This neural network implementation from scratch is an attempt to improve model accuracy through different hyperparameter optimization techniques. 
+Test accuracy is 98%, which is about the best you can get for the dataset. 
+
+Dataset: [Sloan Digital Sky Survey DR14](https://www.kaggle.com/lucidlenn/sloan-digital-sky-survey)
+
+## Introduction
+
+### Dataset
+From the dataset description: "The data consists of 10,000 observations of space taken by the SDSS. Every observation is described by 17 feature columns and 1 class column which identifies it to be either a star, galaxy or quasar."
+
+#### Features
+
+### Star
+Short description
+
+### Galaxy
+Short description
+
+### Quasar
+Short description
 
 
-## The purposes of this project:
-* Compare the performance (accuracy) of manual, random and informed hyperparameter tuning methods.
-* Analyze results and suggest possible improvements. 
+
+## Distribution of celestial bodies
+Insert visual representation
 
 
-Dataset: [Heart disease UCI](https://www.kaggle.com/ronitf/heart-disease-uci)
+
+## Neural network architecture
+
+
+
+## Results
+Test accuracy: 0.985
+Stars accuracy: 0.9906976744186047
+Galaxies accuracy: 0.9827935222672065
+Quasars accuracy: 0.9671052631578947
+
+
 
 <br />
 
 ## Run program
-* Call heart_disease(data_file) in heart_disease.py.
-* Pass tuning="random" or tuning="bayes" to use random search or bayes optimization.
-* Drop passing the tuning argument to tune manually. 
 
 <br /> <br />
 
-
-
-## Manual search
-As reported in [Heart disease detection through neural network 1](), tuning manually, 
-I achieved 80% - 87% accuracy on the cross-validation set. 
-
-<br />	   
-
-## Random search
-Random search works by selecting random values for the hyperparameters. This is a totally uninformed approach, learning nothing from past results. 
 
 ### Results
 ![](images/random_results.png?raw=true)
@@ -39,6 +56,8 @@ Above, you can see the results from a single test run of 250 random selections o
 Running the random search algorithm about 50 times has resulted in cross-validation accuracies of 84% - 90%. 
 
  <br />
+
+
 
 ## Bayesian hyperparameter optimization
 Contrary to random search, this approach considers the performance of previously selected hyperparameters when selecting which hyperparameters to try next.
@@ -61,19 +80,3 @@ For this project, Bayesian optimization is done with the Hyperopt library, and t
 
 In the table above, you can see results from running the bayesian optimizer with random initialization of data to training and cross validation sets. The accuracy on the cross-validation set is about 90%. In general it ranges from 84% - 94% depending on random initialization of data. 
 
-<br />
-
-## Conclusions
-Both random search and bayesian optimization result in much better accuracies on the cross-validation set compared with manual tuning.
-
-Bayesian optimization performed only a little bit better than random search. This is likely due to the small dataset, as it easier to get "lucky" with less data. 
-
-<br />
-
-## Possible improvements
-* More data.
-
-<br />
-
-
-The dataset has 303 examples, which likely isn't enough for this problem. 

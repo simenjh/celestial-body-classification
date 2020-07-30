@@ -6,7 +6,8 @@ To do list celestial body classification
 * Implement mini-batch gradient descent xxx
 * Implement Adam optimization xxx
 * m in update_parameters is incorrect xxx
-* Test set
+* Test set xxx
+* Improve hidden layer selection in Baysesian hyperparameter tuning
 
 
 

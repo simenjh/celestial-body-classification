@@ -51,34 +51,7 @@ def train_mini_batch_model(X_batches, y_batches, parameters, V, S, epochs, learn
 
 
 
-def train_various_sizes(X_train, X_cv, y_train, y_cv, parameters, V, activation_layers, epochs, learning_rate, reg_param):
-    costs_train, costs_cv, m_examples = [], [], []
-    for i in range(1, X_train.shape[1], 20):
-        parameters = init_params(X_train, activation_layers)
-        costs_epochs, parameters = train_model(X_train[:, :i], y_train[:, :i], parameters, V, epochs, learning_rate, reg_param)
 
-        AL_cv, caches = forward_propagation(X_cv, parameters)
-        cost_cv = compute_cost(AL_cv, y_cv, parameters, reg_param)
-
-        costs_train.append(costs_epochs["costs"][-1])
-        costs_cv.append(cost_cv)
-        m_examples.append(i)
-
-    return costs_train, costs_cv, m_examples
-
-
-
-
-
-
-
-
-
-        
-        
-
-    
-    
 def backprop(AL, y, caches):
     grads = {}
     L = len(caches)
@@ -209,9 +182,6 @@ def update_parameters(parameters, gradients, V, S, batch_size, t, learning_rate,
         S_dW_corrected = S[f"dW{l}"] / (1 - (beta2**t))
         S_db_corrected = S[f"db{l}"] / (1 - (beta2**t))
 
-        # if(np.any(S[f"dW{l}"] < 0)):
-        #     print("Not fucking good!")
-
         # Adam optimization
         parameters[f"W{l}"] -= learning_rate * (V_dW_corrected / (np.sqrt(S_dW_corrected) + epsilon))
         parameters[f"b{l}"] -= learning_rate * (V_db_corrected / (np.sqrt(S_db_corrected) + epsilon))
@@ -241,22 +211,26 @@ def regularize_cost(parameters, m, reg_param):
     return (reg_param / (2 * m)) * temp
 
 
-
-def compute_accuracy(X, y, parameters):
-    AL, caches = forward_propagation(X, parameters)
-    y_pred = np.where(AL >= 0.5, 1, 0)
-
-    comparison = np.where(y_pred == y, 1, 0)
-    return np.sum(comparison) / y.shape[1]
-
-
-def compute_accuracy(X, y, parameters):
+def compute_test_accuracy(X, y, parameters):
     AL, caches = forward_propagation(X, parameters)
     
-    y_ints = y.argmax(axis=0).reshape(1, -1)
+    y_classes = y.argmax(axis=0).reshape(1, -1)
     y_pred = AL.argmax(axis=0).reshape(1, -1)
 
-    comparison = np.where(y_pred == y_ints, 1, 0)
-    return np.sum(comparison) / y_ints.shape[1]
+    test_accuracy = np.sum(np.where(y_classes == y_pred, 1, 0)) / y_pred.shape[1]
+
+    y_stars = np.where(y_classes == 0, 1, 0)
+    y_pred_stars = np.where(y_pred == 0, 1, 0)
+
+    y_galaxies = np.where(y_classes == 1, 1, 0)
+    y_pred_galaxies = np.where(y_pred == 1, 1, 0)
+
+    y_quasars = np.where(y_classes == 2, 1, 0)
+    y_pred_quasars = np.where(y_pred == 2, 1, 0)
+
+    stars_accuracy = np.sum(y_stars * y_pred_stars) / np.sum(y_stars)
+    galaxies_accuracy = np.sum(y_galaxies * y_pred_galaxies) / np.sum(y_galaxies)
+    quasars_accuracy = np.sum(y_quasars * y_pred_quasars) / np.sum(y_quasars)
     
+    return {"test": test_accuracy, "stars": stars_accuracy, "galaxies": galaxies_accuracy, "quasars": quasars_accuracy}
     

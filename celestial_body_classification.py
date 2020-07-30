@@ -25,52 +25,27 @@ y_batches = None
 
 
 
-def celestial_body(data_file, epochs=10, learning_rate=0.1, reg_param=0.1, batch_size=64, tuning=False, plot_learning_curves=False, plot_results=False):
-    global X_train_std, X_cv_std, y_train, y_cv, X_batches, y_batches
+def celestial_body(data_file, epochs=10, learning_rate=0.1, reg_param=0.1, batch_size=64, plot_results=False):
+    global X_train_std, X_cv_std, X_test_std, y_train, y_cv, y_test, X_batches, y_batches
+
+    # dataplot.plot_class_distribution(data_file)
     
     X, y = dproc.read_and_preprocess_data(data_file)
     
-    X_train, X_cv, y_train, y_cv = train_test_split(X, y, test_size=0.1)
-    X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=(1/9))
-
+    X_train, X_cv, y_train, y_cv = train_test_split(X, y, test_size=0.2)
+    X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=(1/4))
 
     # Standardize data
-    X_train_std, X_cv_std = dproc.standardize(X_train, X_cv)
+    X_train_std, X_cv_std, X_test_std = dproc.standardize(X_train, X_cv, X_test)
 
     # Make mini batches
     X_batches, y_batches = dproc.make_batches(X_train_std.T, y_train.T, batch_size)
     
-   
-    if tuning == "bayes":
-        bayes_tune(plot_results)
-    else:
-        train_manually(epochs, learning_rate, reg_param, plot_learning_curves)
+    bayes_tune(plot_results)
     
 
 
     
-        
-
-
-
-def train_manually(epochs, learning_rate, reg_param, plot_learning_curves):
-    activation_layers = (X_train_std.shape[1], 25, 1)
-    parameters, V = model.init_params_and_V(activation_layers)
-
-    model.train_model(X_train_std.T, y_train.T, parameters, V, epochs, learning_rate, reg_param)
-
-    train_accuracy = model.compute_accuracy(X_train_std.T, y_train.T, parameters)
-    cv_accuracy = model.compute_accuracy(X_cv_std.T, y_cv.T, parameters)
-    
-    print(f"Train accuracy: {train_accuracy}")
-    print(f"CV accuracy: {cv_accuracy}")
-
-
-    if plot_learning_curves:
-        costs_train, costs_cv, m_examples = model.train_various_sizes(X_train_std.T, X_cv_std.T, y_train.T, y_cv.T, parameters, V, activation_layers, 3000, 0.01, reg_param)
-        dataplot.plot_learning_curves(costs_train, costs_cv, m_examples)
-
-
 
 
     
@@ -85,18 +60,23 @@ def bayes_tune(plot_results):
     }
 
     bayes_trials = Trials()
-    best = fmin(objective, space, algo=tpe.suggest, max_evals=3, trials=bayes_trials)
+    best = fmin(objective, space, algo=tpe.suggest, max_evals=100, trials=bayes_trials)
 
     best_result = bayes_trials.best_trial["result"]
-    test_accuracy = model.compute_accuracy(X_test.std, y_test, best_result["parameters"])
-    print(test_accuracy)
+
+    test_accuracies = model.compute_test_accuracy(X_test_std.T, y_test.T, best_result["parameters"])
+
+    print(f"Test accuracy: {test_accuracies['test']}")
+    print(f"Stars accuracy: {test_accuracies['stars']}")
+    print(f"Galaxies accuracy: {test_accuracies['galaxies']}")
+    print(f"Quasars accuracy: {test_accuracies['quasars']}")
 
     if plot_results:
         dataplot.plot_results_bayes(bayes_trials)
 
 
     
-
+        
 def objective(hyper_params):
     activation_layers = tuple(int(a) for a in hyper_params["hidden_layers"]["network"])
     
