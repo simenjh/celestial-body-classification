@@ -25,3 +25,19 @@ def plot_class_distribution(data_file):
     plt.title('Celestial body distribution')
 
     plt.show()
+
+
+
+
+
+
+def plot_results_bayes(best_result):
+    hyper_params = best_result["hyper_params"]
+    cleaned_result = {"Network": [hyper_params["hidden_layers"]["network"]], "Batch size": best_result["batch_size"], "Learning rate": round(hyper_params["learning_rate"], 4), "Epochs": hyper_params["epochs"], "Regularization parameter": round(hyper_params["reg_param"], 4)}
+
+    df = pd.DataFrame.from_dict(cleaned_result)
+    table = plt.table(cellText=df.values, colLabels=df.columns, colWidths = [0.2]*len(df.columns), cellLoc = 'center', rowLoc = 'center', loc='top')
+    table.auto_set_font_size(False)
+    table.set_fontsize(14)
+    plt.axis('off')
+    plt.show()

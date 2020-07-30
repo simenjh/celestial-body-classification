@@ -212,6 +212,15 @@ def regularize_cost(parameters, m, reg_param):
 
 
 
+def compute_accuracy(X, y, parameters):
+    AL, caches = forward_propagation(X, parameters)
+    
+    y_ints = y.argmax(axis=0).reshape(1, -1)
+    y_pred = AL.argmax(axis=0).reshape(1, -1)
+    comparison = np.where(y_pred == y_ints, 1, 0)
+    return np.sum(comparison) / y_ints.shape[1]
+
+
 def compute_test_accuracy(X, y, parameters):
     AL, caches = forward_propagation(X, parameters)
     
