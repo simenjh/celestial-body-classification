@@ -48,7 +48,8 @@ A quasar (also known as a quasi-stellar object abbreviated QSO) is an extremely 
 
 
 ## Neural network architecture
-The network uses mini-batch gradient descent with Adam optimization. The hyperparameters, including units and layers are chosen by the Tree Parzen Estimator algorithm to build the surrogate model used in the Bayesien hyperparameter tuning approach.
+The network uses mini-batch gradient descent with Adam optimization. The hyperparameters, including units and layers are chosen by the Tree Parzen Estimator algorithm to build the surrogate model used in the Bayesian hyperparameter tuning approach.
+<br />
 ![Network](images/network_architecture.png?raw=true)
 
 
